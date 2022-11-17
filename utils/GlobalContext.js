@@ -9,7 +9,10 @@ class GlobalContext{
             "set": -6.999204,
             "ch": -8.397043
         }
-        
+        this.semantic_scores = []
+
+        this.finalScores = {}
+
         this.functionSet = [
             "registerPathfindingSkill",
             "goToPlayer",
@@ -87,13 +90,28 @@ class GlobalContext{
             })
                     )         
         }
-        Promise.all(res).then((arr) =>{
-            console.log(arr)
+        await Promise.all(res).then((arr) =>{
+            this.semantic_scores = arr;
         })
+    }
+
+    async topPrune(logProbs){
+        if (logProbs)  this.logProbs = logProbs
+        await this.runSemanticSearch()
+        let token = [], values = []
+        for(let i of this.semantic_scores){
+            token.push(i.input_token)
+            values.push(i.semantic_similarity_score * Math.exp(this.logProbs[i.input_token]))
+            this.finalScores[i.input_token] = i.semantic_similarity_score * Math.exp(this.logProbs[i.input_token])
+        }
+        console.log(this.finalScores)
+        let ret = { tokenSelected: token[values.indexOf(Math.max(...values))], value: Math.max(...values) }
+        console.log(ret)
+        return { tokenSelected: token[values.indexOf(Math.max(...values))], value: Math.max(...values) }
     }
 }
 const mainState = new GlobalContext();
+mainState.topPrune()
 
-mainState.runSemanticSearch()
 
 module.exports = mainState;
