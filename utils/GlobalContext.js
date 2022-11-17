@@ -42,6 +42,22 @@ class GlobalContext{
 
         ]
     }
+
+    parseCode(generation){
+            for (let i = 0; i < generation.length; i++) {
+                if (generation[i] == '(' && (i >=4 || generation.slice(i-4,i) != "then")){
+                    var j=i
+                    for(j =i;j>-1;j--){
+                        if (j==-1 || generation[j] == "." || generation[j]==" " || generation[j]=="\n"){
+                            break
+                        }
+                    }
+                    //i is paranthesis index
+                    return [j+1,i]
+                }
+            }
+            return false;
+    }
     
 
     async SemanticSearch(data) {
@@ -80,3 +96,4 @@ const mainState = new GlobalContext();
 
 mainState.runSemanticSearch()
 
+module.exports = mainState;

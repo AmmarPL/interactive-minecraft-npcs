@@ -7,7 +7,7 @@ module.exports =  async function query(data) {
 			body: JSON.stringify(data),
 		}
 	);
-	const result = await response.json();
+	const result = await response.json(); 
 	// return result;
 	
 	return { input_token: data.inputs.sourse_sentence, token: data.inputs.sentences[result.indexOf(Math.max(...result))], semantic_similarity_score: Math.max(...result)};

@@ -13,6 +13,8 @@ let result = null;
 let _DEBUG = process.env.DEBUG === "true";
 let bot = null;
 
+const mainState = require("./utils/GlobalContext");
+
 const {
   registerPathfindingSkill,
   goToPlayer,
