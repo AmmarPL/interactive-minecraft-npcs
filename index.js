@@ -154,9 +154,63 @@ function connect (port = process.env.PORT) {
       return;
     }
 
+    mainState.resetPrompt()
     const prompt = context.craftPrompt(message);
+    const promptMain = mainState.craftPrompt(message);
+    mainState.prompt += `// ${message}\n`
     try {
-      completion = await model.getCompletion(prompt);
+      // completion = await model.getCompletion(prompt);
+      // while(mainState.parseCode(generation))
+
+
+      // let { completion, tok, logprobs } = await model.getCompletion(promptMain);
+
+      
+      console.log("flag: ") 
+      // console.log(flag)
+      // console.log(completion, tok, logprobs)
+      // while(flag != false){
+      let { completion, tok, logprobs } = await model.getCompletion(mainState.prompt);
+      let flag = mainState.parseCode(tok, completion)
+      //     logProbs = flag[0]
+      //     // initialise logProbs
+      console.log({logprobs})
+      console.log({flag: flag[0]})
+      mainState.logProbs = logprobs[flag[0]]
+      // console.log(mainState.logProbs)
+      mainState.addToPrompt(flag[3]) 
+      mainState.parsedCode += flag[3]
+      let topSelected = (await mainState.topPrune()).tokenSelected
+      console.log({topSelected})
+      mainState.addToPrompt(topSelected)
+      mainState.parsedCode += topSelected
+      // console.log(mainState.prompt)
+      let { completion1, tok1, logprobs1 } = await model.getCompletion(mainState.prompt);
+      // console.log({logprobs1})
+      // console.log({flag: flag[0]})
+      // mainState.logProbs = logprobs[flag[0]]
+      // // console.log(mainState.logProbs)
+      // mainState.addToPrompt(flag[3]) 
+      // mainState.parsedCode += flag[3]
+      // topSelected = (await mainState.topPrune()).tokenSelected
+      // console.log({topSelected})
+      // mainState.addToPrompt(topSelected)
+      console.log({completion1})
+      mainState.parsedCode += completion1
+      //     // run top prune
+      //     // append to prompt
+      //     mainState.prompt.push(flag[2])
+      //     //run parsecode again 
+      // let { completion, tok, logprobs } = await model.getCompletion(mainState.prompt);
+
+      flag = mainState.parseCode(tok, completion)
+      console.log("XXX")
+      // console.log(flag)
+      // flag = false
+      // }
+      console.log(`The concatenated code is: ${mainState.parsedCode}`)
+
+      console.log(`Completion is: ${completion}`)
     } catch (err) {
       recordException(err);
       console.log("Error calling Codex", err);
@@ -167,6 +221,7 @@ function connect (port = process.env.PORT) {
           "I had to reset my brain and might have forgotten some context. Sorry about that!"
         );
         recordEvent("reset", username, message);
+        mainState.resetContext();
         context.resetContext();
       }
       return;

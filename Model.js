@@ -20,7 +20,8 @@ class Model {
           max_tokens: 300,
           temperature: 0,
           stop: "//",
-          n: 1
+          n: 1,
+          logprobs: 5
         })
       }
     );
@@ -31,10 +32,13 @@ class Model {
     }
 
     const json = await response.json();
+    // console.log(json.choices[0].logprobs.tokens)
+    // console.log(json.choices[0].logprobs.top_logprobs)
 
     this.completions = json.choices.map(choice => choice.text);
     this.removeDuplicateCompletions();
-    return this.getNextCompletion();
+    return { completion: this.getNextCompletion(), tok: json.choices[0].logprobs.tokens, logprobs: json.choices[0].logprobs.top_logprobs};
+    // return { message: this.getNextCompletion(), logProbs: json.choices[0].logprobs};
   }
 
   getNextCompletion() {
