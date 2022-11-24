@@ -1,0 +1,3 @@
+createQueryPrompt(bot, {}, 'Build me a house')
+.then(queryPrompt => model.getCompletion(queryPrompt))
+.then(completion => evaluateCode(completion, true))

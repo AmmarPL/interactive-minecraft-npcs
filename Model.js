@@ -5,15 +5,17 @@ const fetch = require('isomorphic-fetch');
 class Model {
   constructor() {
     this.completions = [];
+    this.count = 0
+    this.API_KEYS = [process.env.CODEX_API_KEY, process.env.CODEX_API_KEY_2]
   }
-
   async getCompletion(prompt) {
+    this.count += 1
     const response = await fetch(
       'https://api.openai.com/v1/engines/code-davinci-002/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': ` Bearer ${process.env.CODEX_API_KEY}`
+          'Authorization': ` Bearer ${this.API_KEYS[this.count % 2]}`
         },
         body: JSON.stringify({
           prompt: prompt,
@@ -37,7 +39,7 @@ class Model {
 
     this.completions = json.choices.map(choice => choice.text);
     this.removeDuplicateCompletions();
-    return { completion: this.getNextCompletion(), tok: json.choices[0].logprobs.tokens, logprobs: json.choices[0].logprobs.top_logprobs};
+    return { generatedCode: this.getNextCompletion(), tok: json.choices[0].logprobs.tokens, logprobs: json.choices[0].logprobs.top_logprobs};
     // return { message: this.getNextCompletion(), logProbs: json.choices[0].logprobs};
   }
 

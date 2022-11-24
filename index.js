@@ -12,7 +12,7 @@ let target = null;
 let result = null;
 let _DEBUG = process.env.DEBUG === "true";
 let bot = null;
-
+let no_request = 0
 const mainState = require("./utils/GlobalContext");
 
 const {
@@ -149,76 +149,91 @@ function connect (port = process.env.PORT) {
         context.fixResponse(completion);
         await evaluateCode(completion);
       } else {
-        bot.chat("I'm all out of attempts!");
+        bot.chat("I'm all out of attempts!"); 
       }
       return;
-    }
-
-    mainState.resetPrompt()
+    } 
+ 
+    // mainState.resetPrompt()
     const prompt = context.craftPrompt(message);
     const promptMain = mainState.craftPrompt(message);
     mainState.prompt += `// ${message}\n`
-    try {
-      // completion = await model.getCompletion(prompt);
-      // while(mainState.parseCode(generation))
 
 
-      // let { completion, tok, logprobs } = await model.getCompletion(promptMain);
+    let query = ''  
+    let first_inference = false
+    let check_mcr = false
 
-      
-      console.log("flag: ") 
-      // console.log(flag)
-      // console.log(completion, tok, logprobs)
-      // while(flag != false){
-      let { completion, tok, logprobs } = await model.getCompletion(mainState.prompt);
-      let flag = mainState.parseCode(tok, completion)
-      //     logProbs = flag[0]
-      //     // initialise logProbs
-      console.log({logprobs})
-      console.log({flag: flag[0]})
-      mainState.logProbs = logprobs[flag[0]]
-      // console.log(mainState.logProbs)
+    if(check_mcr){
+      let { generatedCode, tok, logprobs } = await model.getCompletion(mainState.prompt);
+      completion = generatedCode
+      console.log(typeof(completion), completion)    
+      }
+else{
+
+  
+  try {
+    
+    // perform model's actions 
+    exec = true
+    while(exec == true){
+      no_request += 1
+      let { generatedCode, tok, logprobs } = await model.getCompletion(mainState.prompt);
+      if (!first_inference){
+        first_inference = true
+        fs = require('fs');
+        fs.writeFile('first_inference.txt', generatedCode, function (err) {
+          if (err) return console.log(err);
+          console.log('Inference Logged');
+        });
+      }
+      console.log({generatedCode})
+      let flag = mainState.parseCode(tok, generatedCode)
+      if(flag == false){
+        exec = false;
+        mainState.addToPrompt(generatedCode)
+        mainState.parsedCode += generatedCode
+        query += generatedCode
+        fs = require('fs');
+        fs.writeFile('query.txt', query, function (err) {
+          if (err) return console.log(err);
+          console.log('Inference Logged');
+        });
+        break; 
+      } 
       mainState.addToPrompt(flag[3]) 
       mainState.parsedCode += flag[3]
-      let topSelected = (await mainState.topPrune()).tokenSelected
+      query += flag[3]
+      let topSelected = (await mainState.topPrune(logprobs[flag[0]])).tokenSelected
       console.log({topSelected})
       mainState.addToPrompt(topSelected)
       mainState.parsedCode += topSelected
-      // console.log(mainState.prompt)
-      let { completion1, tok1, logprobs1 } = await model.getCompletion(mainState.prompt);
-      // console.log({logprobs1})
-      // console.log({flag: flag[0]})
-      // mainState.logProbs = logprobs[flag[0]]
-      // // console.log(mainState.logProbs)
-      // mainState.addToPrompt(flag[3]) 
-      // mainState.parsedCode += flag[3]
-      // topSelected = (await mainState.topPrune()).tokenSelected
-      // console.log({topSelected})
-      // mainState.addToPrompt(topSelected)
-      console.log({completion1})
-      mainState.parsedCode += completion1
-      //     // run top prune
-      //     // append to prompt
-      //     mainState.prompt.push(flag[2])
-      //     //run parsecode again 
-      // let { completion, tok, logprobs } = await model.getCompletion(mainState.prompt);
-
-      flag = mainState.parseCode(tok, completion)
-      console.log("XXX")
-      // console.log(flag)
-      // flag = false
-      // }
-      console.log(`The concatenated code is: ${mainState.parsedCode}`)
-
-      console.log(`Completion is: ${completion}`)
-    } catch (err) {
-      recordException(err);
-      console.log("Error calling Codex", err);
-
-      // if err string contains 400
-      if (err.message.includes("400")) {
-        bot.chat(
-          "I had to reset my brain and might have forgotten some context. Sorry about that!"
+      query += topSelected
+      fs = require('fs');
+      fs.writeFile('query.txt', query, function (err) {
+        if (err) return console.log(err);
+        console.log('Inference Logged');
+      });
+    }
+    
+    
+    fs = require('fs');
+    fs.writeFile('helloworld.txt', mainState.prompt, function (err) {
+      if (err) return console.log(err);
+      console.log('Hello World > helloworld.txt');
+    });
+    
+    
+    console.log(`Query is: ${query}`)
+    completion = query
+  } catch (err) {
+    recordException(err);
+    console.log("Error calling Codex", err);
+    
+    // if err string contains 400
+    if (err.message.includes("400")) {
+      bot.chat(
+        "I had to reset my brain and might have forgotten some context. Sorry about that!"
         );
         recordEvent("reset", username, message);
         mainState.resetContext();
@@ -226,7 +241,10 @@ function connect (port = process.env.PORT) {
       }
       return;
     }
-
+    
+  }
+    console.log({no_request})
+    
     if (completion) {
       // Automatically append this interaction to the context
       recordInteraction("completion", username, message, completion);
@@ -253,13 +271,13 @@ function connect (port = process.env.PORT) {
       } catch (err) {
         handleError(err);
         return false;
-      }
+      } 
     }
 
     function handleError (err) {
       recordException(err);
       console.log("Error evaluating code:", err);
-      bot.chat(err.message);
+      bot.chat(err.message); 
       if (err.name !== "Error") {
         context.removeLastInteraction();
         bot.chat("I unlearned our last interaction!");
