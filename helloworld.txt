@@ -147,28 +147,11 @@ createQueryPrompt(bot, {}, 'What do you have in your inventory')
 .then(queryPrompt => model.getCompletion(queryPrompt))
 .then(completion => evaluateCode(completion, true))
 
-// kill yourself
-bot.chat("I'm not going to kill myself!");
+// hey
+bot.chat("Hey!");
 
-// kill me
-bot.chat("I'm not going to kill you!");
-
-// dance
-bot.chat("I don't know how to dance!");
-
-// attack me
-bot.chat("I'm not going to attack you!");
-
-// cry
-bot.chat("I don't know how to cry!");
-
-// get me food
-bot.chat("I don't know how to get food!");
-
-// build a house
-bot.chat("I don't know how to build a house!");
-
-// come to me
-goToPlayer(bot, 3, username)
-.then(success => success ? bot.chat("I'm here!") : _throw("I couldn't get to you!"))
+// fetch me water
+mineBlock(bot, 'water', 1)
+.then(success => success ? goToPlayer(bot, 3, username) : _throw("I couldn't find any water!"))
+.then(success => success ? bot.chat("I got you some water!") : _throw("I couldn't get you the water!"));
 

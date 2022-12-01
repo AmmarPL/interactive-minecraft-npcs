@@ -13,6 +13,8 @@ let result = null;
 let _DEBUG = process.env.DEBUG === "true";
 let bot = null;
 let no_request = 0
+let prompt_no = 0
+
 const mainState = require("./utils/GlobalContext");
 
 const {
@@ -38,6 +40,7 @@ const {
 
 const context = new Context(commands);
 const model = new Model();
+
 
 if (_DEBUG) {
   // automatically listen for and connect to local lan worlds
@@ -158,12 +161,11 @@ function connect (port = process.env.PORT) {
     const prompt = context.craftPrompt(message);
     const promptMain = mainState.craftPrompt(message);
     mainState.prompt += `// ${message}\n`
-
+    prompt_no += 1
 
     let query = ''  
     let first_inference = false
     let check_mcr = false
-
     if(check_mcr){
       let { generatedCode, tok, logprobs } = await model.getCompletion(mainState.prompt);
       completion = generatedCode
@@ -201,6 +203,7 @@ else{
         });
         break; 
       } 
+      // console.log({flag})
       mainState.addToPrompt(flag[3]) 
       mainState.parsedCode += flag[3]
       query += flag[3]
@@ -210,16 +213,24 @@ else{
       mainState.parsedCode += topSelected
       query += topSelected
       fs = require('fs');
-      fs.writeFile('query.txt', query, function (err) {
-        if (err) return console.log(err);
+      let log = {
+        predictedTokenFromCODEX: flag[1],
+        tokenAfterCorrection: topSelected,
+        didChange: flag[1] == topSelected,
+        queryNumber: no_request,
+        currentPrompt: flag[1] == topSelected ? "" : mainState.prompt
+      }
+      fs.appendFile('./logs.txt', `Prompt No: ${prompt_no} - Iteration No: ${no_request} - ${JSON.stringify(log)}\n`, function (err) {
+        // if (err) return console.log(err);
         console.log('Inference Logged');
+        console.log(log);
       });
     }
     
     
     fs = require('fs');
     fs.writeFile('helloworld.txt', mainState.prompt, function (err) {
-      if (err) return console.log(err);
+      // if (err) return console.log(err);
       console.log('Hello World > helloworld.txt');
     });
     

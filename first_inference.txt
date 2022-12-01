@@ -1,3 +1,4 @@
-createQueryPrompt(bot, {}, 'Build me a house')
-.then(queryPrompt => model.getCompletion(queryPrompt))
-.then(completion => evaluateCode(completion, true))
+locateBlock(bot, 'water', 0)
+.then(waterBlock => fetchBlock(bot, waterBlock))
+.then(success => success ? bot.chat("I got you some water!") : _throw("I couldn't get you water!"))
+
