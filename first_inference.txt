@@ -1,4 +1,2 @@
-locateBlock(bot, 'water', 0)
-.then(waterBlock => fetchBlock(bot, waterBlock))
-.then(success => success ? bot.chat("I got you some water!") : _throw("I couldn't get you water!"))
+mineBlockInterval && mineBlockInterval._throw("I stopped mining!")
 

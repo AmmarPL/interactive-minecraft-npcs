@@ -1,4 +1,2 @@
-mineBlock(bot, 'water', 1)
-.then(success => success ? goToPlayer(bot, 3, username) : _throw("I couldn't find any water!"))
-.then(success => success ? bot.chat("I got you some water!") : _throw("I couldn't get you the water!"));
+mineBlockInterval && mineBlockInterval._throw("I stopped mining!")
 

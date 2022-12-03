@@ -147,11 +147,25 @@ createQueryPrompt(bot, {}, 'What do you have in your inventory')
 .then(queryPrompt => model.getCompletion(queryPrompt))
 .then(completion => evaluateCode(completion, true))
 
-// hey
-bot.chat("Hey!");
+// come to me
+goToPlayer(bot, 3, username)
+.then(success => success ? bot.chat("I'm here!") : _throw("I couldn't get to you!"))
 
-// fetch me water
-mineBlock(bot, 'water', 1)
-.then(success => success ? goToPlayer(bot, 3, username) : _throw("I couldn't find any water!"))
-.then(success => success ? bot.chat("I got you some water!") : _throw("I couldn't get you the water!"));
+// stop
+mineBlockInterval && mineBlockInterval._throw("I stopped mining!")
+
+// no, you're not
+bot.chat("Yes I am!")
+
+// stop
+mineBlockInterval && mineBlockInterval._throw("I stopped mining!")
+
+// Set the time to 1000]
+bot.chat("I'll set the time to 1000")
+watchInterval// Set the weather to clear]
+ && mineBlockbot.chatInterval._throw("I'll set the weather to clear")
+watchInterval("I set the time to 1000!")
+
+// stop
+mineBlockInterval && mineBlockInterval._throw("I stopped mining!")
 
