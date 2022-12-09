@@ -17,6 +17,13 @@ let prompt_no = 0
 
 const mainState = require("./utils/GlobalContext");
 
+let fs = require('fs');
+
+fs.writeFile('logs.txt', "", function (err) {
+  // if (err) return console.log(err);
+  console.log('');
+});
+
 const {
   registerPathfindingSkill,
   goToPlayer,
@@ -37,6 +44,7 @@ const {
   openChest,
   closeChest,
 } = require("./skillsLoader");
+
 
 const context = new Context(commands);
 const model = new Model();
@@ -175,26 +183,29 @@ else{
 
   
   try {
-    
+
     // perform model's actions 
     exec = true
     while(exec == true){
       no_request += 1
       let { generatedCode, tok, logprobs } = await model.getCompletion(mainState.prompt);
+      // console.log({logprobs})
+      console.log({first_inference, generatedCode: mainState.parsedCode + generatedCode})
       if (!first_inference){
-        first_inference = true
+        console.log("Called")
+        console.log({first_inference: mainState.parsedCode + generatedCode})
         fs = require('fs');
-        fs.writeFile('first_inference.txt', generatedCode, function (err) {
+        fs.writeFile('fist_inference.txt', generatedCode, function (err) {
           if (err) return console.log(err);
-          console.log('Inference Logged');
+          console.log('First Inference Logged');
         });
+        first_inference = true
       }
-      console.log({generatedCode})
       let flag = mainState.parseCode(tok, generatedCode)
       if(flag == false){
         exec = false;
-        mainState.addToPrompt(generatedCode)
-        mainState.parsedCode += generatedCode
+        mainState.addToPrompt(`${generatedCode}`)
+        mainState.parsedCode += `${generatedCode}`
         query += generatedCode
         fs = require('fs');
         fs.writeFile('query.txt', query, function (err) {
@@ -203,15 +214,32 @@ else{
         });
         break; 
       } 
-      // console.log({flag})
-      mainState.addToPrompt(flag[3]) 
-      mainState.parsedCode += flag[3]
-      query += flag[3]
-      let topSelected = (await mainState.topPrune(logprobs[flag[0]])).tokenSelected
+      console.log({flag})
+      mainState.addToPrompt(`${flag[3]}`)
+      mainState.parsedCode += `${flag[3]}`
+      query += flag[3] 
+      let lp = logprobs[flag[0]]
+      // if (flag[2] != lp[flag[1]]){
+      //   lp[flag[2]] = lp[flag[1]]
+      //   console.log("Deleted" + flag[1] + " " + flag[2])
+      //   delete lp[flag[1]]
+      // }
+
+      if (flag[1] != flag[2]){
+        lp[flag[2]] = lp[flag[1]]
+        delete lp[flag[1]]
+        console.log({ FLAGG: lp })
+      }
+
+
+      let topSelected = (await mainState.topPrune(lp)).tokenSelected
+      if(topSelected == undefined){
+        console.log("Undefined Topselected")
+      }
       console.log({topSelected})
-      mainState.addToPrompt(topSelected)
-      mainState.parsedCode += topSelected
-      query += topSelected
+      mainState.addToPrompt(`${topSelected}(`) 
+      mainState.parsedCode += `${topSelected}(`
+      query += `${topSelected}(`
       fs = require('fs');
       let log = {
         predictedTokenFromCODEX: flag[1],
@@ -222,8 +250,8 @@ else{
       }
       fs.appendFile('./logs.txt', `Prompt No: ${prompt_no} - Iteration No: ${no_request} - ${JSON.stringify(log)}\n`, function (err) {
         // if (err) return console.log(err);
-        console.log('Inference Logged');
-        console.log(log);
+        // console.log('Inference Logged');
+        // console.log(log);
       });
     }
     
@@ -265,14 +293,20 @@ else{
 
     async function evaluateCode (code, recursive = false) {
       // Echo the code produced for players to see it. Don't echo when the bot code is already producing dialog or it will double echo
+      try {
+        const mcode = code;
       if (code && !code.startsWith("bot.chat")) {
         // Echo the first 9 lines of code. Any more can result in the bot being expelled from the server for spamming
-        const lines = code?.split("\n");
+        const lines = code?.split("\n"); 
         const firstNine = lines.slice(0, 9).join("\n");
+        console.log({ firstNine, code: "(async () => {return " + code + "})()" })
         _log(firstNine);
       }
-      try {
-        await eval("(async () => {return " + code + "})()").catch((err) => handleError(err));
+        // await eval("(async () => {return " + code + "})()").catch((err) => handleError(err));
+        await eval(`${mcode}`)
+        // await eval("locateBlock(bot, 'rail', 0)\n" +
+        // `.then(success => success ? bot.mount(bot.nearestEntity((entity) => { return entity.name === 'minecart' })) : _throw("I couldn't find the rail!"))\n` +
+        // '\n')
         if (recursive) {
           bot.chat(result);
           recordInteraction("completion", bot.username, "Response: " + result, "", true);

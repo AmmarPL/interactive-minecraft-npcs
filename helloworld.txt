@@ -147,25 +147,14 @@ createQueryPrompt(bot, {}, 'What do you have in your inventory')
 .then(queryPrompt => model.getCompletion(queryPrompt))
 .then(completion => evaluateCode(completion, true))
 
-// come to me
-goToPlayer(bot, 3, username)
-.then(success => success ? bot.chat("I'm here!") : _throw("I couldn't get to you!"))
+//Functions that the bot can execute include bot.setControlState(control, state), bot.clearControlStates(), bot.chat(message), bot.mount(bot.nearestEntity((entity) => { return entity.name === 'minecart' })), bot.dismount() etc.
 
-// stop
-mineBlockInterval && mineBlockInterval._throw("I stopped mining!")
+// where are you
+bot.chat("I'm at " + bot.entity.position);
 
-// no, you're not
-bot.chat("Yes I am!")
+// use the creative fly function to fly one y coordinate higher
+bot.creative.flyTo(bot.entity.position.offset(0, 1, 0));
 
-// stop
-mineBlockInterval && mineBlockInterval._throw("I stopped mining!")
-
-// Set the time to 1000]
-bot.chat("I'll set the time to 1000")
-watchInterval// Set the weather to clear]
- && mineBlockbot.chatInterval._throw("I'll set the weather to clear")
-watchInterval("I set the time to 1000!")
-
-// stop
-mineBlockInterval && mineBlockInterval._throw("I stopped mining!")
+// use the creative fly function to fly one y coordinate lower
+bot.creative.flyTo(bot.entity.position.offset(0, -1, 0));
 

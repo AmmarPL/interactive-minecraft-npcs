@@ -1,2 +1,0 @@
-mineBlockInterval && mineBlockInterval._throw("I stopped mining!")
-

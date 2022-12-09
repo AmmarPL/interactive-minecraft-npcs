@@ -147,6 +147,8 @@ createQueryPrompt(bot, {}, 'What do you have in your inventory')
 .then(queryPrompt => model.getCompletion(queryPrompt))
 .then(completion => evaluateCode(completion, true))
 
+//Functions that the bot can execute include bot.setControlState(control, state), bot.clearControlStates(), bot.chat(message), bot.mount(bot.nearestEntity((entity) => { return entity.name === 'minecart' })), bot.dismount() etc.
+
 `;
 
 // export the commands
