@@ -168,6 +168,7 @@ function connect (port = process.env.PORT) {
     // mainState.resetPrompt()
     const prompt = context.craftPrompt(message);
     const promptMain = mainState.craftPrompt(message);
+
     mainState.prompt += `// ${message}\n`
     prompt_no += 1
 
@@ -184,16 +185,13 @@ else{
   
   try {
 
-    // perform model's actions 
     exec = true
+    // iteratively loop till generated code runs out of functions i.e, parseCode function returning false 
     while(exec == true){
       no_request += 1
       let { generatedCode, tok, logprobs } = await model.getCompletion(mainState.prompt);
-      // console.log({logprobs})
-      console.log({first_inference, generatedCode: mainState.parsedCode + generatedCode})
+
       if (!first_inference){
-        console.log("Called")
-        console.log({first_inference: mainState.parsedCode + generatedCode})
         fs = require('fs');
         fs.writeFile('fist_inference.txt', generatedCode, function (err) {
           if (err) return console.log(err);
@@ -219,16 +217,9 @@ else{
       mainState.parsedCode += `${flag[3]}`
       query += flag[3] 
       let lp = logprobs[flag[0]]
-      // if (flag[2] != lp[flag[1]]){
-      //   lp[flag[2]] = lp[flag[1]]
-      //   console.log("Deleted" + flag[1] + " " + flag[2])
-      //   delete lp[flag[1]]
-      // }
-
       if (flag[1] != flag[2]){
         lp[flag[2]] = lp[flag[1]]
         delete lp[flag[1]]
-        console.log({ FLAGG: lp })
       }
 
 
@@ -236,7 +227,6 @@ else{
       if(topSelected == undefined){
         console.log("Undefined Topselected")
       }
-      console.log({topSelected})
       mainState.addToPrompt(`${topSelected}(`) 
       mainState.parsedCode += `${topSelected}(`
       query += `${topSelected}(`
@@ -249,9 +239,9 @@ else{
         currentPrompt: flag[1] == topSelected ? "" : mainState.prompt
       }
       fs.appendFile('./logs.txt', `Prompt No: ${prompt_no} - Iteration No: ${no_request} - ${JSON.stringify(log)}\n`, function (err) {
-        // if (err) return console.log(err);
-        // console.log('Inference Logged');
-        // console.log(log);
+        if (err) return console.log(err);
+        console.log('Inference Logged');
+        console.log(log);
       });
     }
     
