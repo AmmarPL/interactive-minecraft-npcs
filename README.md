@@ -44,7 +44,7 @@ To run this prototype, you'll need the following:
 
 You should now see an NPC appear that you can interact with! To type commands or messages to the NPC, press "t" to open the chat window, and type the command or message. 
 
-![Minecraft 1 17 1 - Multiplayer (LAN) 2022-12-05 06-54-40](https://github.com/AmmarPL/interactive-minecraft-npcs/assets/46021351/89d94ce6-1494-4ed0-90b8-210a4e041550)
+![Minecraft 1 17 1 - Multiplayer (LAN) 2022-12-05 06-54-40 (3)](https://github.com/AmmarPL/interactive-minecraft-npcs/assets/46021351/58b9fe54-8e64-428c-b398-8b90310424f2)
 
 ## How it Works
 
@@ -57,8 +57,6 @@ bot.setControlState('back', true)
 // "Hello!"
 bot.chat("Yo! How's it going?");
 ```
-
-![Minecraft 1 17 1 - Multiplayer (LAN) 2022-12-05 06-54-40 (3)](https://github.com/AmmarPL/interactive-minecraft-npcs/assets/46021351/58b9fe54-8e64-428c-b398-8b90310424f2)
 
 As you can see, we give commands in the form of comments, which is followed by the code that should be executed to satisfy the command. When calling the model, we can now simply pass a comment with our command (e.g. `// "Go Forward"`) and the model will generate the next line - the code that satisfies the command (e.g. `bot.setControlState('forward', true)`). In the `index.js`, we run the code by simply calling JavaScript's "eval" function on it. 
 
