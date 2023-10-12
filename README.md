@@ -3,20 +3,9 @@
 ![Minecraft 1 17 1 - Multiplayer (LAN) 2022-12-05 06-54-40 (2)](https://github.com/AmmarPL/interactive-minecraft-npcs/assets/46021351/ec92eba5-5bff-4afb-829a-8751e00cfa39)
 
 
-This project is built on Microsoft's Minecraft bot https://github.com/microsoft/interactive-minecraft-npcs. The Microsoft project contained code referred in:
+This project is built on Microsoft's Minecraft bot https://github.com/microsoft/interactive-minecraft-npcs.
 
-
-
-
-
-```bibtex
-@inproceedings{volum2022craft,
-  title={Craft an Iron Sword: Dynamically Generating Interactive Game Characters by Prompting Large Language Models Tuned on Code},
-  author={Volum, Ryan and Rao, Sudha and Xu, Michael and DesGarennes, Gabriel A and Brockett, Chris and Van Durme, Benjamin and Deng, Olivia and Malhotra, Akanksha and Dolan, Bill},
-  booktitle={The Third Wordplay: When Language Meets Games Workshop},
-  year={2022}
-}
-```
+To read about our work in more detail, refer to [this link](https://drive.google.com/file/d/12ovvuARMlz3iOGaZi6zT36eh4Xu97ixJ/view?usp=sharing).
 
 ## Getting Started
 
