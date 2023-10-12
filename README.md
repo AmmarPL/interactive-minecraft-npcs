@@ -1,8 +1,13 @@
 # Guided Generation of Code to Control a Minecraft Bot
 
+![Minecraft 1 17 1 - Multiplayer (LAN) 2022-12-05 06-54-40 (2)](https://github.com/AmmarPL/interactive-minecraft-npcs/assets/46021351/ec92eba5-5bff-4afb-829a-8751e00cfa39)
+
+
 This project is built on Microsoft's Minecraft bot https://github.com/microsoft/interactive-minecraft-npcs. The Microsoft project contained code referred in:
 
-<a href="https://wordplay-workshop.github.io/modern/assets/pdfs/6.pdf">Craft an Iron Sword: Dynamically Generating Interactive Game Characters by Prompting Large Language Models Tuned on Code</a><br/>
+
+
+
 
 ```bibtex
 @inproceedings{volum2022craft,
@@ -39,6 +44,8 @@ To run this prototype, you'll need the following:
 
 You should now see an NPC appear that you can interact with! To type commands or messages to the NPC, press "t" to open the chat window, and type the command or message. 
 
+![Minecraft 1 17 1 - Multiplayer (LAN) 2022-12-05 06-54-40](https://github.com/AmmarPL/interactive-minecraft-npcs/assets/46021351/89d94ce6-1494-4ed0-90b8-210a4e041550)
+
 ## How it Works
 
 The context directory contains some examples of natural instructions and corresponding code to help Codex understand the syntax of the code it needs to generate. We apply an iterative method to parse the code and modify invalid functions. After correcting the first invalid function, we call Codex again to generate the remaining part after the function name. This process is repeated.
@@ -50,6 +57,8 @@ bot.setControlState('back', true)
 // "Hello!"
 bot.chat("Yo! How's it going?");
 ```
+
+![Minecraft 1 17 1 - Multiplayer (LAN) 2022-12-05 06-54-40 (3)](https://github.com/AmmarPL/interactive-minecraft-npcs/assets/46021351/58b9fe54-8e64-428c-b398-8b90310424f2)
 
 As you can see, we give commands in the form of comments, which is followed by the code that should be executed to satisfy the command. When calling the model, we can now simply pass a comment with our command (e.g. `// "Go Forward"`) and the model will generate the next line - the code that satisfies the command (e.g. `bot.setControlState('forward', true)`). In the `index.js`, we run the code by simply calling JavaScript's "eval" function on it. 
 
